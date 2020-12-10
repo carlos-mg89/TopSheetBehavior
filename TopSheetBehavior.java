@@ -81,9 +81,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
      */
     public static final int STATE_HIDDEN = 5;
 
-    /**
-     * @hide
-     */
     @IntDef({STATE_EXPANDED, STATE_COLLAPSED, STATE_DRAGGING, STATE_SETTLING, STATE_HIDDEN})
     @Retention(RetentionPolicy.SOURCE)
     public @interface State {
@@ -93,7 +90,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
 
     private static final float HIDE_FRICTION = 0.1f;
 
-    private float mMaximumVelocity;
+    private final float mMaximumVelocity;
 
     private int mPeekHeight;
 
@@ -116,8 +113,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
 
     private boolean mNestedScrolled;
 
-    private int mParentHeight;
-
     private WeakReference<V> mViewRef;
 
     private WeakReference<View> mNestedScrollingChildRef;
@@ -132,18 +127,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
 
     private boolean mTouchingScrollingChild;
 
-    /**
-     * Default constructor for instantiating TopSheetBehaviors.
-     */
-    public TopSheetBehavior() {
-    }
-
-    /**
-     * Default constructor for inflating TopSheetBehaviors from layout.
-     *
-     * @param context The {@link Context}.
-     * @param attrs   The {@link AttributeSet}.
-     */
     public TopSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
@@ -184,7 +167,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         // First let the parent lay it out
         parent.onLayoutChild(child, layoutDirection);
         // Offset the bottom sheet
-        mParentHeight = parent.getHeight();
         mMinOffset = Math.max(-child.getHeight(), -(child.getHeight() - mPeekHeight));
         mMaxOffset = 0;
         if (mState == STATE_EXPANDED) {
@@ -286,16 +268,20 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     @Override
-    public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull V child,
-                                       @NonNull View directTargetChild, @NonNull View target, int nestedScrollAxes) {
+    public boolean onStartNestedScroll(
+            @NonNull CoordinatorLayout coordinatorLayout, @NonNull V child, @NonNull View directTargetChild,
+            @NonNull View target, int nestedScrollAxes, @ViewCompat.NestedScrollType int type
+    ) {
         mLastNestedScrollDy = 0;
         mNestedScrolled = false;
         return (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
     }
 
     @Override
-    public void onNestedPreScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull V child, @NonNull View target, int dx,
-                                  int dy, @NonNull int[] consumed) {
+    public void onNestedPreScroll(
+            @NonNull CoordinatorLayout coordinatorLayout, @NonNull V child, @NonNull View target,
+            int dx, int dy, @NonNull int[] consumed, @ViewCompat.NestedScrollType int type
+    ) {
         View scrollingChild = mNestedScrollingChildRef.get();
         if (target != scrollingChild) {
             return;
@@ -332,7 +318,10 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     @Override
-    public void onStopNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull V child, @NonNull View target) {
+    public void onStopNestedScroll(
+            @NonNull CoordinatorLayout coordinatorLayout, @NonNull V child, @NonNull View target,
+            @ViewCompat.NestedScrollType int type
+    ) {
         if (child.getTop() == mMaxOffset) {
             setStateInternal(STATE_EXPANDED);
             return;
@@ -383,7 +372,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
      * Sets the height of the bottom sheet when it is collapsed.
      *
      * @param peekHeight The height of the collapsed bottom sheet in pixels.
-     * @attr ref com.google.android.material..R.styleable#TopSheetBehavior_Params_behavior_peekHeight
      */
     public final void setPeekHeight(int peekHeight) {
         mPeekHeight = Math.max(0, peekHeight);
@@ -396,50 +384,23 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
      * Gets the height of the bottom sheet when it is collapsed.
      *
      * @return The height of the collapsed bottom sheet.
-     * @attr ref com.google.android.material..R.styleable#BottomSheetBehavior_Layout_behavior_peekHeight
      */
     public final int getPeekHeight() {
         return mPeekHeight;
     }
 
-    /**
-     * Sets whether this bottom sheet can hide when it is swiped down.
-     *
-     * @param hideable {@code true} to make this bottom sheet hideable.
-     * @attr ref com.google.android.material..R.styleable#BottomSheetBehavior_Layout_behavior_hideable
-     */
     public void setHideable(boolean hideable) {
         mHideable = hideable;
     }
 
-    /**
-     * Gets whether this bottom sheet can hide when it is swiped down.
-     *
-     * @return {@code true} if this bottom sheet can hide.
-     * @attr ref com.google.android.material..R.styleable#BottomSheetBehavior_Layout_behavior_hideable
-     */
     public boolean isHideable() {
         return mHideable;
     }
 
-    /**
-     * Sets whether this bottom sheet should skip the collapsed state when it is being hidden
-     * after it is expanded once. Setting this to true has no effect unless the sheet is hideable.
-     *
-     * @param skipCollapsed True if the bottom sheet should skip the collapsed state.
-     * @attr ref com.google.android.material..R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
-     */
     public void setSkipCollapsed(boolean skipCollapsed) {
         mSkipCollapsed = skipCollapsed;
     }
 
-    /**
-     * Sets whether this bottom sheet should skip the collapsed state when it is being hidden
-     * after it is expanded once.
-     *
-     * @return Whether the bottom sheet should skip the collapsed state.
-     * @attr ref com.google.android.material..R.styleable#BottomSheetBehavior_Layout_behavior_skipCollapsed
-     */
     public boolean getSkipCollapsed() {
         return mSkipCollapsed;
     }
@@ -674,13 +635,8 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         @State
         final int state;
 
-        public SavedState(Parcel source) {
-            this(source, null);
-        }
-
         public SavedState(Parcel source, ClassLoader loader) {
             super(source, loader);
-            //noinspection ResourceType
             state = source.readInt();
         }
 
@@ -731,10 +687,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     static int constrain(int amount, int low, int high) {
-        return amount < low ? low : (amount > high ? high : amount);
-    }
-
-    static float constrain(float amount, float low, float high) {
-        return amount < low ? low : (amount > high ? high : amount);
+        return amount < low ? low : (Math.min(amount, high));
     }
 }
