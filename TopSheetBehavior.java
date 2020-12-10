@@ -56,29 +56,10 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         public abstract void onSlide(@NonNull View bottomSheet, float slideOffset);
     }
 
-    /**
-     * The bottom sheet is dragging.
-     */
     public static final int STATE_DRAGGING = 1;
-
-    /**
-     * The bottom sheet is settling.
-     */
     public static final int STATE_SETTLING = 2;
-
-    /**
-     * The bottom sheet is expanded.
-     */
     public static final int STATE_EXPANDED = 3;
-
-    /**
-     * The bottom sheet is collapsed.
-     */
     public static final int STATE_COLLAPSED = 4;
-
-    /**
-     * The bottom sheet is hidden.
-     */
     public static final int STATE_HIDDEN = 5;
 
     @IntDef({STATE_EXPANDED, STATE_COLLAPSED, STATE_DRAGGING, STATE_SETTLING, STATE_HIDDEN})
@@ -87,7 +68,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     }
 
     private static final float HIDE_THRESHOLD = 0.5f;
-
     private static final float HIDE_FRICTION = 0.1f;
 
     private final float mMaximumVelocity;
