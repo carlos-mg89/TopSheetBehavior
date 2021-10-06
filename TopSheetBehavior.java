@@ -616,16 +616,16 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
             out.writeInt(state);
         }
 
-        public static final Parcelable.ClassLoaderCreator<SavedState> CREATOR =
-                new Parcelable.ClassLoaderCreator<SavedState>() {
+        public static final Creator<SavedState> CREATOR =
+                new ClassLoaderCreator<SavedState>() {
                     @Override
-                    public SavedState createFromParcel(Parcel source) {
-                        return createFromParcel(source, null);
+                    public SavedState createFromParcel(@NonNull Parcel in, ClassLoader loader) {
+                        return new SavedState(in, loader);
                     }
 
                     @Override
-                    public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                        return new SavedState(in, loader);
+                    public SavedState createFromParcel(@NonNull Parcel in) {
+                        return new SavedState(in, null);
                     }
 
                     @Override
@@ -641,16 +641,17 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
      * @param view The {@link View} with {@link TopSheetBehavior}.
      * @return The {@link TopSheetBehavior} associated with the {@code view}.
      */
-    public static <V extends View> TopSheetBehavior<V> from(V view) {
+    @NonNull
+    @SuppressWarnings("unchecked")
+    public static <V extends View> TopSheetBehavior<V> from(@NonNull V view) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof CoordinatorLayout.LayoutParams)) {
             throw new IllegalArgumentException("The view is not a child of CoordinatorLayout");
         }
-        CoordinatorLayout.Behavior behavior = ((CoordinatorLayout.LayoutParams) params)
-                .getBehavior();
+        CoordinatorLayout.Behavior<?> behavior =
+                ((CoordinatorLayout.LayoutParams) params).getBehavior();
         if (!(behavior instanceof TopSheetBehavior)) {
-            throw new IllegalArgumentException(
-                    "The view is not associated with TopSheetBehavior");
+            throw new IllegalArgumentException("The view is not associated with TopSheetBehavior");
         }
         return (TopSheetBehavior<V>) behavior;
     }
