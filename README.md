@@ -1,11 +1,11 @@
 TopSheet - a "top" version of BottomSheetBehavior
 =========================================
 
-TopSheetBehavior is a code based on https://github.com/MedveDomg/AndroidTopSheet . The major change here is that this project has taken into account the AndroidX on SDK 28 dependencies and has fully migrated it so there are no more dependencies on the old Android Support packages.
+TopSheetBehavior is a code based on https://github.com/MedveDomg/AndroidTopSheet. 
+
+The major change is that this project has taken into account the latest changes until Android SDK 30 (2021 October) and has been migrated it to AndroidX so there are no more dependencies on the old Android Support packages.
 
 Aside from that, some functions that were deprecated on the original project, have been replaced with the newer counterparts.
-
-A few functions, that are inherited from CoordinatorLayout still require a migration, since they are now deprecated.
 
 TopSheetBehavior
 -----
@@ -48,7 +48,6 @@ TopSheetDialog dialog = new TopSheetDialog(this);
 dialog.setContentView(R.layout.sheet_content);
 dialog.show();
 ```
-
 
 
 License
