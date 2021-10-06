@@ -5,7 +5,11 @@ TopSheetBehavior is a code based on https://github.com/MedveDomg/AndroidTopSheet
 
 The major change is that this project has taken into account the latest changes until Android SDK 30 (2021 October) and has been migrated it to AndroidX so there are no more dependencies on the old Android Support packages.
 
-Aside from that, some functions that were deprecated on the original project, have been replaced with the newer counterparts.
+Aside from that, some functions that were deprecated on the original project, have been replaced with newer counterparts.
+
+I try to follow the changes than the official BottomSheetBehavior has, in order for this class to be as consistent and as up-to-date as possible.
+
+More info: https://github.com/material-components/material-components-android/blob/master/lib/java/com/google/android/material/bottomsheet/BottomSheetBehavior.java
 
 TopSheetBehavior
 -----
