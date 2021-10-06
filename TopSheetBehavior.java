@@ -2,23 +2,20 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.core.os.ParcelableCompat;
-import androidx.core.os.ParcelableCompatCreatorCallbacks;
-import androidx.core.view.NestedScrollingChild;
-import androidx.core.view.ViewCompat;
-import androidx.customview.view.AbsSavedState;
-import androidx.customview.widget.ViewDragHelper;
-
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.view.NestedScrollingChild;
+import androidx.core.view.ViewCompat;
+import androidx.customview.view.AbsSavedState;
+import androidx.customview.widget.ViewDragHelper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -129,6 +126,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
     @Override
     public void onRestoreInstanceState(@NonNull CoordinatorLayout parent, @NonNull V child, @NonNull Parcelable state) {
         SavedState ss = (SavedState) state;
+        assert ss.getSuperState() != null;
         super.onRestoreInstanceState(parent, child, ss.getSuperState());
         // Intermediate states are restored as collapsed state
         if (ss.state == STATE_DRAGGING || ss.state == STATE_SETTLING) {
@@ -360,21 +358,8 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         }
     }
 
-    /**
-     * Gets the height of the bottom sheet when it is collapsed.
-     *
-     * @return The height of the collapsed bottom sheet.
-     */
-    public final int getPeekHeight() {
-        return mPeekHeight;
-    }
-
     public void setHideable(boolean hideable) {
         mHideable = hideable;
-    }
-
-    public boolean isHideable() {
-        return mHideable;
     }
 
     public void setSkipCollapsed(boolean skipCollapsed) {
@@ -631,8 +616,13 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
             out.writeInt(state);
         }
 
-        public static final Creator<SavedState> CREATOR = ParcelableCompat.newCreator(
-                new ParcelableCompatCreatorCallbacks<SavedState>() {
+        public static final Parcelable.ClassLoaderCreator<SavedState> CREATOR =
+                new Parcelable.ClassLoaderCreator<SavedState>() {
+                    @Override
+                    public SavedState createFromParcel(Parcel source) {
+                        return createFromParcel(source, null);
+                    }
+
                     @Override
                     public SavedState createFromParcel(Parcel in, ClassLoader loader) {
                         return new SavedState(in, loader);
@@ -642,7 +632,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
                     public SavedState[] newArray(int size) {
                         return new SavedState[size];
                     }
-                });
+                };
     }
 
     /**
@@ -651,7 +641,6 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
      * @param view The {@link View} with {@link TopSheetBehavior}.
      * @return The {@link TopSheetBehavior} associated with the {@code view}.
      */
-    @SuppressWarnings("unchecked")
     public static <V extends View> TopSheetBehavior<V> from(V view) {
         ViewGroup.LayoutParams params = view.getLayoutParams();
         if (!(params instanceof CoordinatorLayout.LayoutParams)) {
