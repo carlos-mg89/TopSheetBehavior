@@ -179,8 +179,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
         }
         mVelocityTracker.addMovement(event);
         switch (action) {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 mTouchingScrollingChild = false;
                 mActivePointerId = MotionEvent.INVALID_POINTER_ID;
                 // Reset the ignore flag
@@ -188,8 +187,8 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
                     mIgnoreEvents = false;
                     return false;
                 }
-                break;
-            case MotionEvent.ACTION_DOWN:
+            }
+            case MotionEvent.ACTION_DOWN -> {
                 int initialX = (int) event.getX();
                 mInitialY = (int) event.getY();
                 View scroll = mNestedScrollingChildRef.get();
@@ -199,7 +198,7 @@ public class TopSheetBehavior<V extends View> extends CoordinatorLayout.Behavior
                 }
                 mIgnoreEvents = mActivePointerId == MotionEvent.INVALID_POINTER_ID &&
                         !parent.isPointInChildBounds(child, initialX, mInitialY);
-                break;
+            }
         }
         if (!mIgnoreEvents && mViewDragHelper.shouldInterceptTouchEvent(event)) {
             return true;
